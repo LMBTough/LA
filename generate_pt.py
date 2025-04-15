@@ -27,4 +27,4 @@ for i in range(1000):
     img = torch.tensor(img).permute(2, 0, 1)
     img_batch.append(img)
 img_batch = torch.stack(img_batch)
-torch.save('data/img_batch.pt', img_batch)
+torch.save(img_batch,'data/img_batch.pt')
