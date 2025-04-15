@@ -8,20 +8,20 @@ HW = 224 * 224 # image area
 n_classes = 1000
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def gkern(klen, nsig):
-    """Returns a Gaussian kernel array.
-    Convolution with it results in image blurring."""
-    # create nxn zeros
-    inp = np.zeros((klen, klen))
-    # set element at the middle to one, a dirac delta
-    inp[klen//2, klen//2] = 1
-    # gaussian-smooth the dirac, resulting in a gaussian filter mask
-    k = gaussian_filter(inp, nsig)
-    kern = np.zeros((3, 3, klen, klen))
-    kern[0, 0] = k
-    kern[1, 1] = k
-    kern[2, 2] = k
-    return torch.from_numpy(kern.astype('float32'))
+# def gkern(klen, nsig):
+#     """Returns a Gaussian kernel array.
+#     Convolution with it results in image blurring."""
+#     # create nxn zeros
+#     inp = np.zeros((klen, klen))
+#     # set element at the middle to one, a dirac delta
+#     inp[klen//2, klen//2] = 1
+#     # gaussian-smooth the dirac, resulting in a gaussian filter mask
+#     k = gaussian_filter(inp, nsig)
+#     kern = np.zeros((3, 3, klen, kl/≥n))
+#     kern[0, 0] = k
+#     kern[1, 1] = k
+#     kern[2, 2] = k
+#     return torch.from_numpy(kern.astype('float32'))
 
 def auc(arr):
     """Returns normalized Area Under Curve of the array."""
@@ -64,6 +64,7 @@ class CausalMetric():
         top, c = torch.max(pred, 1)
         c = c.cpu().numpy()[0]
         n_steps = (HW + self.step - 1) // self.step
+        print(n_steps)
 
         if self.mode == 'del':
             title = 'Deletion game'
@@ -82,12 +83,15 @@ class CausalMetric():
             salient_order = np.argsort(explanation.reshape(-1, HW), axis=1)
         else:
             salient_order = np.flip(np.argsort(explanation.reshape(-1, HW), axis=1), axis=-1)
+        # print(explanation.reshape(-1, HW).shape)
+        # print(np.argsort(explanation.reshape(-1, HW), axis=1).max())
         for i in range(n_steps+1):
             pred = self.model(start.to(device))
+            print(pred[0, c])
             pr, cl = torch.topk(pred, 2)
-            if verbose == 2:
-                print('{}: {:.3f}'.format(get_class_name(cl[0][0]), float(pr[0][0])))
-                print('{}: {:.3f}'.format(get_class_name(cl[0][1]), float(pr[0][1])))
+            # if verbose == 2:
+            #     print('{}: {:.3f}'.format(get_class_name(cl[0][0]), float(pr[0][0])))
+            #     print('{}: {:.3f}'.format(get_class_name(cl[0][1]), float(pr[0][1])))
             scores[i] = pred[0, c]
             # Render image if verbose, if it's the last step or if save is required.
             if verbose == 2 or (verbose == 1 and i == n_steps) or save_to:
@@ -112,7 +116,13 @@ class CausalMetric():
                     plt.show()
             if i < n_steps:
                 coords = salient_order[:, self.step * i:self.step * (i + 1)]
+                # print("coords: ",coords)
+                # print("coordsshape: ",coords.shape)
+                # print(HW)
+                # print(start.cpu().numpy().reshape(1, 3, HW).shape)
                 start.cpu().numpy().reshape(1, 3, HW)[0, :, coords] = finish.cpu().numpy().reshape(1, 3, HW)[0, :, coords]
+                print(start.shape)
+                raise Exception
         return scores
 
     def evaluate(self, img_batch, exp_batch, batch_size):
@@ -137,9 +147,10 @@ class CausalMetric():
         scores = np.empty((n_steps + 1, n_samples))
         # salient_order = np.flip(np.argsort(exp_batch.reshape(-1, HW), axis=1), axis=-1)
         if self.reverse:
-            salient_order = np.argsort(exp_batch.reshape(-1, HW), axis=1)
+            salient_order = np.argsort(exp_batch.reshape(-1, 3*HW), axis=1)
         else:
-            salient_order = np.flip(np.argsort(exp_batch.reshape(-1, HW), axis=1), axis=-1)
+            salient_order = np.flip(np.argsort(exp_batch.reshape(-1, 3*HW), axis=1), axis=-1)
+        # print(salient_order)
         r = np.arange(n_samples).reshape(n_samples, 1)
 
         substrate = torch.zeros_like(img_batch)
@@ -164,9 +175,11 @@ class CausalMetric():
                 preds = preds.detach().cpu().numpy()[range(batch_size), top[j*batch_size:(j+1)*batch_size]]
                 scores[i, j*batch_size:(j+1)*batch_size] = preds
             # Change specified number of most salient pixels to substrate pixels
-            coords = salient_order[:, self.step * i:self.step * (i + 1)]
+            coords = salient_order[:, self.step * i * 3:self.step * (i + 1)*3]
             if i < n_steps:
                 for rr in r:
-                    start.cpu().numpy().reshape(n_samples, 3, HW)[rr, :, coords.reshape(n_samples,3,n_steps)[rr]] = finish.cpu().numpy().reshape(n_samples, 3, HW)[rr, :, coords.reshape(n_samples,3,n_steps)[rr]]        
+                    # start.cpu().numpy().reshape(n_samples, 3, HW)[rr, :, coords.reshape(n_samples,3,n_steps)[rr]] = finish.cpu().numpy().reshape(n_samples, 3, HW)[rr, :, coords.reshape(n_samples,3,n_steps)[rr]]    
+                    start.cpu().numpy().reshape(n_samples, 3*HW)[rr,coords[rr]] = finish.cpu().numpy().reshape(n_samples, 3*HW)[rr,coords[rr]]
+                    
         print('AUC: {}'.format(auc(scores.mean(1))))
         return scores.transpose()
