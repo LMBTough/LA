@@ -34,9 +34,12 @@ def la(model, data, epsilon=10, max_iter=30, select_num=20):
             loss_untarget.backward()
             untarget_grad = adv_image.grad.data.detach().clone()
             
-            adv_image = ori_image + epsilon * target_grad.sign()
+            delta = epsilon * target_grad.sign()
+            adv_image = ori_image + delta
             adv_image = torch.clamp(adv_image, min=0, max=1)
-            result += - untarget_grad * (adv_image - ori_image)
+            delta = adv_image - ori_image
+            delta = - untarget_grad * delta
+            result += delta
             
         attribution_result += result
         
@@ -54,9 +57,12 @@ def la(model, data, epsilon=10, max_iter=30, select_num=20):
         untarget_grad = adv_image.grad.data.detach().clone()
         adv_image.grad.zero_()
         
-        adv_image = ori_image - epsilon * untarget_grad.sign()
+        delta = - epsilon * untarget_grad.sign()
+        adv_image = ori_image + delta
         adv_image = torch.clamp(adv_image, min=0, max=1)
-        result += - untarget_grad * (adv_image - ori_image)
+        delta = adv_image - ori_image
+        delta = - untarget_grad * delta
+        result += delta
         
     attribution_result += result
     attribution_result = attribution_result.squeeze().detach().cpu().numpy()
