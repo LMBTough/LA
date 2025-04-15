@@ -39,7 +39,7 @@ if __name__ == "__main__":
     if not os.path.exists(f"{perfix}/{args.model}_{args.attr_method}_attributions.npy"):
         attr_method = eval(args.attr_method)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        img_batch = torch.load("data/img_batch.pt")
+        img_batch = torch.load("data/img_batch.pt").float()
         target_batch = torch.load("data/label_batch.pt")
 
         dataset = TensorDataset(img_batch, target_batch)

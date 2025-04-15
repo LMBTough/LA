@@ -33,7 +33,7 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if not os.path.exists(f"{perfix}/{args.model}_{args.attr_method}_scores.npz"):
         with torch.no_grad():
-            img_batch = torch.load("data/img_batch.pt")
+            img_batch = torch.load("data/img_batch.pt").float()
             target_batch = torch.load("data/label_batch.pt")
             model = eval(f"{args.model}(pretrained=True).eval().to(device)")
             sfmx = nn.Softmax(dim=-1)
