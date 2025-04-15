@@ -1,7 +1,7 @@
 from evaluation import CausalMetric
 import torch.nn as nn
 from torchvision import transforms
-from torchvision.models import resnet50,inception_v3,vgg16,mobilenet_v2,maxvit_t,vit_b_16
+from torchvision.models import resnet50,inception_v3,vgg16,maxvit_t
 from tqdm import tqdm
 import torch
 import numpy as np
@@ -25,7 +25,7 @@ parser.add_argument('--model', type=str, default='inception_v3',
                     choices=["inception_v3", "resnet50", "vgg16", "mobilenet_v2", "maxvit_t", "vit_b_16"])
 parser.add_argument('--attr_method', type=str, default='agi')
 args = parser.parse_args()
-perfix = f"scores_{args.dataset}_{args.eval_method}"
+perfix = "scores"
 os.makedirs(perfix,exist_ok=True)
 
 
@@ -43,7 +43,7 @@ if __name__ == "__main__":
             model = nn.Sequential(norm_layer, model, sfmx).to(device)
             deletion = CausalMetric(model, 'del', 224, torch.zeros_like,reverse=False)
             insertion = CausalMetric(model, 'ins', 224, torch.zeros_like,reverse=False)
-            attribution = np.load(f"attributions_{args.dataset}/{args.model}_{args.attr_method}_attributions.npy")
+            attribution = np.load(f"attributions/{args.model}_{args.attr_method}_attributions.npy")
             scores = {'del': deletion.evaluate(
                 img_batch, attribution, 100), 'ins': insertion.evaluate(img_batch, attribution, 100)}
             scores['ins'] = np.array(scores['ins'])

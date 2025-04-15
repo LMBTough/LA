@@ -7,7 +7,7 @@ import torch
 import random
 from torch.utils.data import TensorDataset, DataLoader
 import os
-from torchvision.models import maxvit_t,vit_b_16,inception_v3,resnet50,vgg16,mobilenet_v2
+from torchvision.models import maxvit_t,inception_v3,resnet50,vgg16
 from saliency.saliency_zoo import *
 def setup_seed(seed):
      torch.manual_seed(seed)
@@ -24,10 +24,10 @@ parser.add_argument('--model', type=str, default='inception_v3')
 parser.add_argument('--attr_method', type=str, default='agi')
 args = parser.parse_args()
 
-perfix = f"attributions_{args.dataset}"
+perfix = "attributions"
 os.makedirs(perfix,exist_ok=True)
 
-attr_methods_with_softmax = ["mfaba","agi","ampe","isa"]
+attr_methods_with_softmax = ["mfaba","agi","ampe"]
 
 if args.attr_method == "deeplift":
     from resnet_mod import resnet50
@@ -55,18 +55,16 @@ if __name__ == "__main__":
                 starts_with = True
                 break
         if starts_with:
-            model = nn.Sequential(norm_layer, model).to(device) if args.single_softmax else nn.Sequential(norm_layer, model, sfmx).to(device)
+            model = nn.Sequential(norm_layer, model).to(device)
         else:
-            model = nn.Sequential(norm_layer, model, sfmx).to(device) if args.single_softmax else nn.Sequential(norm_layer, model, sfmx,nn.Softmax(-1)).to(device)
+            model = nn.Sequential(norm_layer, model, sfmx).to(device)
         if args.attr_method.startswith('fast_ig') or args.attr_method.startswith('guided_ig') or args.attr_method.startswith('big'):
             batch_size = 1
         elif args.attr_method.startswith('ig') or args.attr_method.startswith('ampe') or args.attr_method.startswith('eg') or args.attr_method.startswith("sg") or args.attr_method.startswith("deeplift"):
             batch_size = 4
-        elif args.attr_method.startswith('agi') or args.attr_method.startswith('negflux') or args.attr_method.startswith('mfaba') or args.attr_method.startswith('isa') or args.attr_method.startswith('sm') or args.attr_method.startswith('la'):
+        elif args.attr_method.startswith('agi') or args.attr_method.startswith('mfaba') or args.attr_method.startswith('sm') or args.attr_method.startswith('la'):
             batch_size = 64
-        elif args.attr_method == 'saliencymap':
-            batch_size = 128
-        if args.model == "maxvit_t" or args.model == "vit_b_16":
+        if args.model == "maxvit_t":
             if args.attr_method != "eg":
                 if batch_size > 2:
                     batch_size = batch_size // 2
