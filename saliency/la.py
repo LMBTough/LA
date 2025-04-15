@@ -5,7 +5,7 @@ from torch.nn import functional as F
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def la(model, data, epsilon=10, max_iter=30, select_num=20):
+def la(model, data, target, epsilon=10, max_iter=30, select_num=20):
     assert len(data.shape) == 4, "Input data must be 4D tensor"
     random.seed(3407)
     selected = np.random.choice(1000, select_num, replace=False)
