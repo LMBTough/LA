@@ -12,10 +12,15 @@ pip install -r requirements.txt
 ```
 
 ## 🚀 Usage
+### 1. Generate pt
 
-### 1. Generate Attribution Results
+```bash
+python generate_pt.py
+```
 
-To generate attribution results using a specific attribution method (e.g., Layer-wise Attention):
+### 2. Generate Attribution Results
+
+To generate attribution results using a specific attribution method (e.g.,la):
 
 ```bash
 python generate_attributions.py --attr_method la
@@ -23,7 +28,7 @@ python generate_attributions.py --attr_method la
 
 Replace `la` with any other supported attribution method as needed.
 
-### 2. Evaluate Attribution (Insertion/Deletion)
+### 3. Evaluate Attribution (Insertion/Deletion)
 
 To evaluate the quality of the attributions using the insertion and deletion metrics:
 
@@ -33,7 +38,7 @@ python eval.py --attr_method la
 
 This will compute performance metrics to assess how well the attribution highlights important regions.
 
-### 3. Visualize Attribution
+### 4. Visualize Attribution
 
 To visualize the attribution on the image:
 
