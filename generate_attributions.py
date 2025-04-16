@@ -22,6 +22,8 @@ setup_seed(3407)
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', type=str, default='inception_v3')
 parser.add_argument('--attr_method', type=str, default='agi')
+parser.add_argument('--spatial_range', type=int, default=10)
+parser.add_argument('--samples_number', type=int, default=20)
 args = parser.parse_args()
 
 perfix = "attributions"
@@ -74,6 +76,8 @@ if __name__ == "__main__":
             target = target_batch[i:i+batch_size].to(device)
             if args.attr_method == "eg":
                 attribution = attr_method(model, dataloader, img, target)
+            elif args.attr_method == "la":
+                attribution = attr_method(model, img, target, epsilon=args.spatial_range, max_iter=args.samples_number)
             else:
                 attribution = attr_method(model, img, target)
             attributions.append(attribution)
