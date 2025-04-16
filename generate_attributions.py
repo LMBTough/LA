@@ -57,9 +57,9 @@ if __name__ == "__main__":
                 starts_with = True
                 break
         if starts_with:
-            model = nn.Sequential(norm_layer, model).to(device)
+            model = nn.Sequential(norm_layer, model).eval().to(device)
         else:
-            model = nn.Sequential(norm_layer, model, sfmx).to(device)
+            model = nn.Sequential(norm_layer, model, sfmx).eval().to(device)
         if args.attr_method.startswith('fast_ig') or args.attr_method.startswith('guided_ig') or args.attr_method.startswith('big'):
             batch_size = 1
         elif args.attr_method.startswith('ig') or args.attr_method.startswith('ampe') or args.attr_method.startswith('eg') or args.attr_method.startswith("sg") or args.attr_method.startswith("deeplift"):

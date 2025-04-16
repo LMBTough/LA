@@ -39,7 +39,7 @@ if __name__ == "__main__":
             mean = [0.485, 0.456, 0.406]
             std = [0.229, 0.224, 0.225]
             norm_layer = transforms.Normalize(mean, std)
-            model = nn.Sequential(norm_layer, model, sfmx).to(device)
+            model = nn.Sequential(norm_layer, model, sfmx).eval().to(device)
             deletion = CausalMetric(model, 'del', 224, torch.zeros_like,reverse=False)
             insertion = CausalMetric(model, 'ins', 224, torch.zeros_like,reverse=False)
             attribution = np.load(f"attributions/{args.model}_{args.attr_method}_attributions.npy")
