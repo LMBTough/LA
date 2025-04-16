@@ -62,7 +62,7 @@ if __name__ == "__main__":
             model = nn.Sequential(norm_layer, model, sfmx).eval().to(device)
         if args.attr_method.startswith('fast_ig') or args.attr_method.startswith('guided_ig') or args.attr_method.startswith('big'):
             batch_size = 1
-        elif args.attr_method.startswith('ig') or args.attr_method.startswith('ampe') or args.attr_method.startswith('eg') or args.attr_method.startswith("sg") or args.attr_method.startswith("deeplift"):
+        elif args.attr_method.startswith('ig') or args.attr_method.startswith('attexplore') or args.attr_method.startswith('eg') or args.attr_method.startswith("sg") or args.attr_method.startswith("deeplift"):
             batch_size = 4
         elif args.attr_method.startswith('agi') or args.attr_method.startswith('mfaba') or args.attr_method.startswith('sm') or args.attr_method.startswith('la'):
             batch_size = 64
