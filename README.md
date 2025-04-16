@@ -8,7 +8,7 @@
 Make sure you have installed all the necessary dependencies:
 
 ```bash
-pip install -r requirements.txt
+conda env create -f environment.yml
 ```
 
 ## 🚀 Usage
