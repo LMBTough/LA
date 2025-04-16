@@ -21,8 +21,7 @@ setup_seed(3407)
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--model', type=str, default='inception_v3',
-                    choices=["inception_v3", "resnet50", "vgg16", "mobilenet_v2", "maxvit_t", "vit_b_16"])
+parser.add_argument('--model', type=str, default='inception_v3')
 parser.add_argument('--attr_method', type=str, default='agi')
 args = parser.parse_args()
 perfix = "scores"
