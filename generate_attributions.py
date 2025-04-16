@@ -27,7 +27,7 @@ args = parser.parse_args()
 perfix = "attributions"
 os.makedirs(perfix,exist_ok=True)
 
-attr_methods_with_softmax = ["mfaba","agi","ampe"]
+attr_methods_with_softmax = ["mfaba","agi","ampe", "la"]
 
 if args.attr_method == "deeplift":
     from resnet_mod import resnet50
