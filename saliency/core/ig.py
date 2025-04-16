@@ -150,13 +150,28 @@ class IntegratedGradients(GradientAttribution):
 
         scaled_features_tpl = torch.cat(scaled_features_tpl, 0)
         # output = self.forward_func(scaled_features_tpl)
+        # output_tgt = torch.gather(output, 1, expanded_target.unsqueeze(1))
+        # grads = (torch.autograd.grad(output_tgt, scaled_features_tpl, create_graph=True,retain_graph=False,grad_outputs=torch.ones_like(output_tgt))[0].detach(),)
+        grads = list()
         output = list()
         bs = 4
         for i in range(0, scaled_features_tpl.shape[0], bs):
-            output.append(self.forward_func(scaled_features_tpl[i:i+bs]))
+            temp = scaled_features_tpl[i:i + bs]
+            temp = temp.requires_grad_()
+            ot = self.forward_func(temp)
+            output.append(ot)
+            ot_tgt = torch.gather(ot, 1, expanded_target[i:i + bs].unsqueeze(1))
+            grad = torch.autograd.grad(
+                ot_tgt,
+                temp,
+                create_graph=True,
+                retain_graph=False,
+                grad_outputs=torch.ones_like(ot_tgt),
+            )[0].detach()
+            grads.append(grad)
         output = torch.cat(output, 0)
-        output_tgt = torch.gather(output, 1, expanded_target.unsqueeze(1))
-        grads = (torch.autograd.grad(output_tgt, scaled_features_tpl, create_graph=True,retain_graph=False,grad_outputs=torch.ones_like(output_tgt))[0].detach(),)
+        grads = torch.cat(grads, 0)
+        grads = (grads,)
         
         
         # grads = self.gradient_func(
