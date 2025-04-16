@@ -149,7 +149,12 @@ class IntegratedGradients(GradientAttribution):
         # grads: dim -> (bsz * #steps x inputs[0].shape[1:], ...)
 
         scaled_features_tpl = torch.cat(scaled_features_tpl, 0)
-        output = self.forward_func(scaled_features_tpl)
+        # output = self.forward_func(scaled_features_tpl)
+        output = list()
+        bs = 4
+        for i in range(0, scaled_features_tpl.shape[0], bs):
+            output.append(self.forward_func(scaled_features_tpl[i:i+bs]))
+        output = torch.cat(output, 0)
         output_tgt = torch.gather(output, 1, expanded_target.unsqueeze(1))
         grads = (torch.autograd.grad(output_tgt, scaled_features_tpl, create_graph=True,retain_graph=False,grad_outputs=torch.ones_like(output_tgt))[0].detach(),)
         
