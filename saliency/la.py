@@ -5,13 +5,13 @@ from torch.nn import functional as F
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-def la(model, data, target, epsilon=10, max_iter=30, select_num=20):
+def la(model, data, target, spatial_range=10, max_iter=30, sampling_times=20):
     assert len(data.shape) == 4, "Input data must be 4D tensor"
     random.seed(3407)
-    selected = np.random.choice(1000, select_num, replace=False)
+    selected = np.random.choice(1000, sampling_times, replace=False)
     output = model(data)
     init_pred = output.argmax(-1)
-    epsilon = data.clone() / epsilon
+    spatial_range = data.clone() / spatial_range
     attribution_result = torch.zeros_like(data)
     for l in selected[:-1]:
         targeted = torch.tensor([l] * data.shape[0]).to(device)
@@ -34,7 +34,7 @@ def la(model, data, target, epsilon=10, max_iter=30, select_num=20):
             loss_untarget.backward()
             untarget_grad = adv_image.grad.data.detach().clone()
             
-            delta = epsilon * target_grad.sign()
+            delta = spatial_range * target_grad.sign()
             adv_image = ori_image + delta
             adv_image = torch.clamp(adv_image, min=0, max=1)
             delta = adv_image - ori_image
@@ -57,7 +57,7 @@ def la(model, data, target, epsilon=10, max_iter=30, select_num=20):
         untarget_grad = adv_image.grad.data.detach().clone()
         adv_image.grad.zero_()
         
-        delta = - epsilon * untarget_grad.sign()
+        delta = - spatial_range * untarget_grad.sign()
         adv_image = ori_image + delta
         adv_image = torch.clamp(adv_image, min=0, max=1)
         delta = adv_image - ori_image

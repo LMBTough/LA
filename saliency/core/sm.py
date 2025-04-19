@@ -9,5 +9,5 @@ class SaliencyGradient:
         self.saliency = Saliency(model)
 
     def __call__(self, data, target):
-        attribution_map = self.saliency.attribute(data, target=target, abs=False)
+        attribution_map = self.saliency.attribute(data, target=target, abs=True)
         return attribution_map.detach().cpu().numpy()

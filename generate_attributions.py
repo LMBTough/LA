@@ -21,12 +21,18 @@ setup_seed(3407)
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--model', type=str, default='inception_v3')
-parser.add_argument('--attr_method', type=str, default='agi')
-parser.add_argument('--spatial_range', type=int, default=10)
-parser.add_argument('--samples_number', type=int, default=20)
+parser.add_argument('--attr_method', type=str, default='la')
+
+parser.add_argument('--spatial_range', type=int, default=20)
+parser.add_argument('--max_iter', type=int, default=20)
+parser.add_argument('--sampling_times', type=int, default=20)
+
+
+parser.add_argument('--prefix', type=str, default='attributions', 
+                    help='Folder used to save attribution .npy files')
 args = parser.parse_args()
 
-perfix = "attributions"
+perfix = args.prefix 
 os.makedirs(perfix,exist_ok=True)
 
 attr_methods_with_softmax = ["mfaba","agi","attexplore", "la"]
@@ -77,9 +83,12 @@ if __name__ == "__main__":
             if args.attr_method == "eg":
                 attribution = attr_method(model, dataloader, img, target)
             elif args.attr_method == "la":
-                attribution = attr_method(model, img, target, epsilon=args.spatial_range, max_iter=args.samples_number)
+                attribution = attr_method(model, img, target, spatial_range=args.spatial_range, max_iter=args.max_iter, sampling_times=args.sampling_times)
             else:
                 attribution = attr_method(model, img, target)
             attributions.append(attribution)
         attributions = np.concatenate(attributions, axis=0)
-        np.save(f"{perfix}/{args.model}_{args.attr_method}_attributions.npy", attributions)
+        if args.attr_method == 'la':
+            np.save(f"{perfix}/{args.model}_{args.attr_method}_spatial-range-{args.spatial_range}_max-iter-{args.max_iter}_sampling-times-{args.sampling_times}_attributions.npy", attributions)
+        else:
+            np.save(f"{perfix}/{args.model}_{args.attr_method}_attributions.npy", attributions)

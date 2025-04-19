@@ -1,53 +1,133 @@
+# 🧠 Local Attribution (LA)
+
+This repository provides the **official implementation** of the paper:
+
+> **Enhancing Model Interpretability with Local Attribution over Global Exploration**  
+> In *Proceedings of the 32nd ACM International Conference on Multimedia (ACM MM 2024)*  
+> [https://dl.acm.org/doi/abs/10.1145/3664647.3681385]  
+
+We provide a unified framework for generating, evaluating, and visualizing **local attribution** across a wide range of interpretability methods on ImageNet models.
+
+This library is designed to support systematic comparison and reproducibility of attribution methods, especially focusing on the local region-based enhancements proposed in our LA method.
+
 
 ---
 
-# LA
-
 ## 🔧 Requirements
 
-Make sure you have installed all the necessary dependencies:
+Create a virtual environment and install the dependencies:
 
 ```bash
 conda env create -f environment.yml
+conda activate la
 ```
 
+---
+
+## 📂 Directory Structure
+
+```
+LA/
+├── generate_pt.py               # Generate feature files (.pt)
+├── generate_attributions.py     # Compute attribution maps
+├── eval.py                      # Evaluate attribution scores (Insertion, Deletion)
+├── plot.py                      # Basic visualization
+├── para_explore.sh              # Grid search script for LA parameters
+├── saliency/                    # Contains attribution methods
+│   ├── saliency_zoo.py
+│   └── core/
+│       ├── ig.py, la.py, agi.py, ...
+├── data/
+│   └── label_batch.pt           # Labels for evaluation
+├── visualized_imgs/
+│   ├── 0.png, 1.png, 2.png, ... # dataset original images
+├── utils.py, resnet_mod.py, vgg16_mod.py
+├── imagenet_class_index.json
+├── plot_hm.ipynb                # Demo of drawing heatmap results
+└── README.md                    
+```
+
+---
+
 ## 🚀 Usage
-### 1. Generate pt
+
+### 1. Generate Intermediate Features
 
 ```bash
 python generate_pt.py
 ```
 
-### 2. Generate Attribution Results
+This will save `.pt` files containing image features and labels used for attribution.
 
-To generate attribution results using a specific attribution method (e.g.,la):
+---
 
-```bash
-python generate_attributions.py --attr_method la
-```
-
-Replace `la` with any other supported attribution method as needed.
-
-### 3. Evaluate Attribution (Insertion/Deletion)
-
-To evaluate the quality of the attributions using the insertion and deletion metrics:
+### 2. Generate Attribution Maps
 
 ```bash
-python eval.py --attr_method la
+python generate_attributions.py --model resnet50 --attr_method la --spatial_range 20 --max_iter 20 --sampling_times 20
 ```
 
-This will compute performance metrics to assess how well the attribution highlights important regions.
+Replace `la` with any of the supported attribution methods:
 
-### 4. Visualize Attribution
-
-To visualize the attribution on the image:
-
-```python
-from plot import plot
-
-plot(attribution, image)
+```
+["fast_ig", "deeplift", "guided_ig", "ig", "sg", "big", "sm", "mfaba", "eg", "agi", "attexplore", "la"]
 ```
 
-This will generate an overlay showing the attribution map on top of the original image.
+Note: Only `la` uses the additional hyperparameters: `--spatial_range`, `--max_iter`, `--sampling_times`.
+
+---
+
+### 3. Evaluate Attribution Scores
+
+```bash
+python eval.py --model resnet50 --attr_method la --epsilon 20 --spatial_range 20 --samples_number 20 --prefix scores --csv_path results.csv --attr_prefix attributions
+```
+
+This calculates the **Insertion** and **Deletion** metrics and appends results to `results.csv`.
+
+If `attr_method` is not `la`, the corresponding spatial parameters will be marked as `"-"` in the results file.
+
+---
+
+
+### 4. Visualize Attribution Maps
+
+To visualize attribution results, we recommend using the provided Jupyter notebook:
+
+```bash
+jupyter notebook plot_hm.ipynb
+```
+
+---
+
+### 5. Grid Search (Optional)
+
+To perform parameter exploration for `la`, use the script:
+
+```bash
+bash para_explore.sh
+```
+
+---
+
+## 📜 License
+
+This project is licensed under the terms of the [LICENSE](LICENSE) file.
+
+---
+
+### 📚 Citation
+
+If you find this repository helpful in your research, please consider citing our paper:
+
+```bibtex
+@inproceedings{zhu2024enhancing,
+  title={Enhancing model interpretability with local attribution over global exploration},
+  author={Zhu, Zhiyu and Jin, Zhibo and Zhang, Jiayu and Chen, Huaming},
+  booktitle={Proceedings of the 32nd ACM International Conference on Multimedia},
+  pages={5347--5355},
+  year={2024}
+}
+```
 
 ---
