@@ -24,7 +24,7 @@ parser.add_argument('--model', type=str, default='inception_v3')
 parser.add_argument('--attr_method', type=str, default='la')
 parser.add_argument('--spatial_range', type=int, default=20)
 parser.add_argument('--max_iter', type=int, default=20)
-parser.add_argument('--sampling_times', type=int, default=20)
+parser.add_argument('--samples_number', type=int, default=20)
 parser.add_argument('--prefix', type=str, default='scores', 
                     help='Folder used to save scores .npz files')
 parser.add_argument('--attr_prefix', type=str, default='attributions', 
@@ -42,7 +42,7 @@ attr_prefix = args.attr_prefix
 
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    npz_path = f"{prefix}/{args.model}_{args.attr_method}_spatial-range-{args.spatial_range}_max-iter-{args.max_iter}_sampling-times-{args.sampling_times}_scores.npz"
+    npz_path = f"{prefix}/{args.model}_{args.attr_method}_spatial-range-{args.spatial_range}_max-iter-{args.max_iter}_sampling-times-{args.samples_number}_scores.npz"
     
     if not os.path.exists(npz_path):
         with torch.no_grad():
@@ -57,7 +57,7 @@ if __name__ == "__main__":
             deletion = CausalMetric(model, 'del', 224, torch.zeros_like, reverse=False)
             insertion = CausalMetric(model, 'ins', 224, torch.zeros_like, reverse=False)
             if args.attr_method == 'la':
-                attribution = np.load(f"{attr_prefix}/{args.model}_{args.attr_method}_spatial-range-{args.spatial_range}_max-iter-{args.max_iter}_sampling-times-{args.sampling_times}_attributions.npy")
+                attribution = np.load(f"{attr_prefix}/{args.model}_{args.attr_method}_spatial-range-{args.spatial_range}_max-iter-{args.max_iter}_sampling-times-{args.samples_number}_attributions.npy")
             else:
                 attribution = np.load(f"{attr_prefix}/{args.model}_{args.attr_method}_attributions.npy")
             
@@ -79,7 +79,7 @@ with open(args.csv_path, mode='a', newline='') as csv_file:
     writer = csv.writer(csv_file)
     
     if not file_exists:
-        writer.writerow(['model', 'attr_method', 'spatial_range', 'max-iter', 'sampling_times', 'insertion', 'deletion'])
+        writer.writerow(['model', 'attr_method', 'spatial_range', 'max-iter', 'samples_number', 'insertion', 'deletion'])
 
     if args.attr_method == 'la':
         writer.writerow([
@@ -87,7 +87,7 @@ with open(args.csv_path, mode='a', newline='') as csv_file:
             args.attr_method,
             args.spatial_range,
             args.max_iter,
-            args.sampling_times,
+            args.samples_number,
             round(insertion_mean, 6),
             round(deletion_mean, 6)
         ])

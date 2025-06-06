@@ -19,7 +19,15 @@ Create a virtual environment and install the dependencies:
 
 ```bash
 conda env create -f environment.yml
-conda activate la
+conda activate LA
+```
+
+or
+
+```bash
+conda create -n LA python=3.11 -y
+conda activate LA
+pip install -r requirements.txt
 ```
 
 ---
@@ -80,7 +88,7 @@ Note: Only `la` uses the additional hyperparameters: `--spatial_range`, `--max_i
 ### 3. Evaluate Attribution Scores
 
 ```bash
-python eval.py --model resnet50 --attr_method la --epsilon 20 --spatial_range 20 --samples_number 20 --prefix scores --csv_path results.csv --attr_prefix attributions
+python eval.py --model resnet50 --attr_method la --max_iter 20 --spatial_range 20 --samples_number 20 --prefix scores --csv_path results.csv --attr_prefix attributions
 ```
 
 This calculates the **Insertion** and **Deletion** metrics and appends results to `results.csv`.
