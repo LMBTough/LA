@@ -65,13 +65,11 @@ if __name__ == "__main__":
                 'del': deletion.evaluate(img_batch, attribution, 100),
                 'ins': insertion.evaluate(img_batch, attribution, 100)
             }
-            scores['ins'] = np.array(scores['ins'])
-            scores['del'] = np.array(scores['del'])
             np.savez(npz_path, **scores)
 
     data = np.load(npz_path)
-    insertion_mean = np.mean(data['ins'])
-    deletion_mean = np.mean(data['del'])
+    insertion_scores = data['ins']
+    deletion_scores = data['del']
 
     file_exists = os.path.isfile(args.csv_path)
 
@@ -88,8 +86,8 @@ with open(args.csv_path, mode='a', newline='') as csv_file:
             args.spatial_range,
             args.max_iter,
             args.samples_number,
-            round(insertion_mean, 6),
-            round(deletion_mean, 6)
+            round(insertion_scores, 6),
+            round(deletion_scores, 6)
         ])
     else:
         writer.writerow([
@@ -98,6 +96,6 @@ with open(args.csv_path, mode='a', newline='') as csv_file:
             '-',
             '-',
             '-',
-            round(insertion_mean, 6),
-            round(deletion_mean, 6)
+            round(insertion_scores, 6),
+            round(deletion_scores, 6)
         ])

@@ -182,4 +182,4 @@ class CausalMetric():
                     start.cpu().numpy().reshape(n_samples, 3*HW)[rr,coords[rr]] = finish.cpu().numpy().reshape(n_samples, 3*HW)[rr,coords[rr]]
                     
         print('AUC: {}'.format(auc(scores.mean(1))))
-        return scores.transpose()
+        return auc(scores.mean(1))
