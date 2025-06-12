@@ -72,7 +72,6 @@ if __name__ == "__main__":
     deletion_scores = data['del']
 
     file_exists = os.path.isfile(args.csv_path)
-
 with open(args.csv_path, mode='a', newline='') as csv_file:
     writer = csv.writer(csv_file)
     
@@ -86,8 +85,8 @@ with open(args.csv_path, mode='a', newline='') as csv_file:
             args.spatial_range,
             args.max_iter,
             args.samples_number,
-            round(insertion_scores, 6),
-            round(deletion_scores, 6)
+            round(float(insertion_scores), 6),
+            round(float(deletion_scores), 6)
         ])
     else:
         writer.writerow([
@@ -96,6 +95,6 @@ with open(args.csv_path, mode='a', newline='') as csv_file:
             '-',
             '-',
             '-',
-            round(insertion_scores, 6),
-            round(deletion_scores, 6)
+            round(float(insertion_scores), 6),
+            round(float(deletion_scores), 6)
         ])
