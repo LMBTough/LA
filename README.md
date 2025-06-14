@@ -106,7 +106,19 @@ To visualize attribution results, we recommend using the provided Jupyter notebo
 jupyter notebook plot_hm.ipynb
 ```
 
+> **Note**: To reproduce the full set of visualizations shown in the paper, you will need to **precompute the required attribution maps** using:
+>
+> ```bash
+> bash para_explore.sh
+> ```
+>
+> This script generates all attribution results (including baselines and our LA method under different settings) necessary for rendering the visualizations.
+> It ensures consistency with the figures reported in the original paper.
+
+If you only need to visualize a specific method (e.g., LA), we recommend simplifying `plot_hm.ipynb` accordingly.
+
 ---
+
 
 ### 5. Grid Search (Optional)
 
