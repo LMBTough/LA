@@ -30,6 +30,14 @@ conda activate LA
 pip install -r requirements.txt
 ```
 
+
+> **Note**: If you plan to use the visualization notebook (`plot_hm.ipynb`), please make sure `jupyter` is installed:
+>
+> ```bash
+> pip install notebook
+> ```
+
+
 ---
 
 ## 📂 Directory Structure
