@@ -124,6 +124,7 @@ jupyter notebook plot_hm.ipynb
 > It ensures consistency with the figures reported in the original paper.
 
 If you only need to visualize a specific method (e.g., LA), we recommend simplifying `plot_hm.ipynb` accordingly.
+We also provide a [Colab demo](https://colab.research.google.com/drive/1qm7UcSI-hB2TTdAMsYyymvz9tWt576VL#scrollTo=fgBa3qgNiflU) specifically for visualizing the **LA method**, which allows you to explore the results without any local setup.
 
 ---
 
