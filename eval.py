@@ -42,7 +42,12 @@ attr_prefix = args.attr_prefix
 
 if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    npz_path = f"{prefix}/{args.model}_{args.attr_method}_spatial-range-{args.spatial_range}_max-iter-{args.max_iter}_sampling-times-{args.samples_number}_scores.npz"
+    if args.attr_method == 'la':
+        npy_path = f"{attr_prefix}/{args.model}_{args.attr_method}_spatial-range-{args.spatial_range}_max-iter-{args.max_iter}_sampling-times-{args.samples_number}_attributions.npy"
+        npz_path = f"{prefix}/{args.model}_{args.attr_method}_spatial-range-{args.spatial_range}_max-iter-{args.max_iter}_sampling-times-{args.samples_number}_scores.npz"
+    else:
+        npy_path = f"{attr_prefix}/{args.model}_{args.attr_method}_attributions.npy"
+        npz_path = f"{prefix}/{args.model}_{args.attr_method}_scores.npz"
     
     if not os.path.exists(npz_path):
         with torch.no_grad():
@@ -56,10 +61,7 @@ if __name__ == "__main__":
             model = nn.Sequential(norm_layer, model, sfmx).eval().to(device)
             deletion = CausalMetric(model, 'del', 224, torch.zeros_like, reverse=False)
             insertion = CausalMetric(model, 'ins', 224, torch.zeros_like, reverse=False)
-            if args.attr_method == 'la':
-                attribution = np.load(f"{attr_prefix}/{args.model}_{args.attr_method}_spatial-range-{args.spatial_range}_max-iter-{args.max_iter}_sampling-times-{args.samples_number}_attributions.npy")
-            else:
-                attribution = np.load(f"{attr_prefix}/{args.model}_{args.attr_method}_attributions.npy")
+            attribution = np.load(npy_path)
             
             scores = {
                 'del': deletion.evaluate(img_batch, attribution, 100),

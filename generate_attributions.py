@@ -37,6 +37,11 @@ os.makedirs(perfix,exist_ok=True)
 
 attr_methods_with_softmax = ["mfaba","agi","attexplore", "la"]
 
+if args.attr_method == 'la':
+    npy_path = f"{perfix}/{args.model}_{args.attr_method}_spatial-range-{args.spatial_range}_max-iter-{args.max_iter}_sampling-times-{args.sampling_times}_attributions.npy"
+else:
+    npy_path = f"{perfix}/{args.model}_{args.attr_method}_attributions.npy"
+
 if args.attr_method == "deeplift":
     from resnet_mod import resnet50
     from vgg16_mod import vgg16
@@ -44,7 +49,7 @@ if args.attr_method == "deeplift":
 
 if __name__ == "__main__":
     import os
-    if not os.path.exists(f"{perfix}/{args.model}_{args.attr_method}_attributions.npy"):
+    if not os.path.exists(npy_path):
         attr_method = eval(args.attr_method)
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         img_batch = torch.load("data/img_batch.pt").float()
@@ -88,7 +93,4 @@ if __name__ == "__main__":
                 attribution = attr_method(model, img, target)
             attributions.append(attribution)
         attributions = np.concatenate(attributions, axis=0)
-        if args.attr_method == 'la':
-            np.save(f"{perfix}/{args.model}_{args.attr_method}_spatial-range-{args.spatial_range}_max-iter-{args.max_iter}_sampling-times-{args.sampling_times}_attributions.npy", attributions)
-        else:
-            np.save(f"{perfix}/{args.model}_{args.attr_method}_attributions.npy", attributions)
+        np.save(npy_path, attributions)
