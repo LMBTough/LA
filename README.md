@@ -114,17 +114,35 @@ To visualize attribution results, we recommend using the provided Jupyter notebo
 jupyter notebook plot_hm.ipynb
 ```
 
-> **Note**: To reproduce the full set of visualizations shown in the paper, you will need to **precompute the required attribution maps** using:
+This notebook renders attribution heatmaps for various interpretability methods across different models.
+
+> **Note**: To reproduce the **full set of visualizations** shown in the paper, you will need to **precompute the required attribution maps** using:
 >
 > ```bash
 > bash para_explore.sh
 > ```
 >
-> This script generates all attribution results (including baselines and our LA method under different settings) necessary for rendering the visualizations.
-> It ensures consistency with the figures reported in the original paper.
+> This script performs a grid search and generates all attribution results (including baselines and our LA method under different settings), ensuring consistency with the figures reported in the original paper.
 
-If you only need to visualize a specific method (e.g., LA), we recommend simplifying `plot_hm.ipynb` accordingly.
-We also provide a [Colab demo](https://colab.research.google.com/drive/1qm7UcSI-hB2TTdAMsYyymvz9tWt576VL#scrollTo=fgBa3qgNiflU) specifically for visualizing the **LA method**, which allows you to explore the results without any local setup.
+---
+
+### 🔹 Minimal Script for Quick Visualization
+
+If you are only interested in running a quick demo (e.g., to visualize the LA method) without computing the full attribution set, we provide a **minimal script**:
+
+```bash
+bash mini_script_4visual.sh
+```
+
+This script generates the **minimal set of attributions and scores** needed to run `plot_hm.ipynb`. It significantly reduces runtime and is suitable for lightweight testing.
+
+> After running this script, you can directly open `plot_hm.ipynb`, and all required inputs for the notebook will be ready.
+
+---
+
+### 🔗 Colab Demo (No Local Setup Needed)
+
+We also provide a [Google Colab demo](https://colab.research.google.com/drive/1qm7UcSI-hB2TTdAMsYyymvz9tWt576VL#scrollTo=fgBa3qgNiflU) for **visualizing the LA method**, allowing you to try it out directly in the browser without local computation.
 
 ---
 
@@ -158,5 +176,3 @@ If you find this repository helpful in your research, please consider citing our
   year={2024}
 }
 ```
-
----

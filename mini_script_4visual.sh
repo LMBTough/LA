@@ -1,11 +1,11 @@
 #!/bin/bash
 
-models=("inception_v3" "resnet50" "vgg16" "maxvit_t")
+models=("inception_v3")
 attr_methods=("fast_ig" "deeplift" "guided_ig" "ig" "sg" "big" "sm" "mfaba" "eg" "agi" "attexplore" "la")
 
-spatial_ranges=(10 20 30)
-max_iters=(10 20 30)
-sampling_times=(10 20 30)
+spatial_ranges=(20)
+max_iters=(30)
+sampling_times=(30)
 
 for model in "${models[@]}"; do
   for method in "${attr_methods[@]}"; do
@@ -17,7 +17,7 @@ for model in "${models[@]}"; do
 
             echo "Running $model with $method (spatial=$spatial, iter=$iter, sample=$sample)"
 
-            CUDA_VISIBLE_DEVICES=0 python generate_attributions.py \
+            CUDA_VISIBLE_DEVICES=1 python generate_attributions.py \
               --model $model \
               --attr_method $method \
               --spatial_range $spatial \
@@ -25,13 +25,14 @@ for model in "${models[@]}"; do
               --sampling_times $sample \
               --prefix attributions
 
-            CUDA_VISIBLE_DEVICES=0 python eval.py \
+            CUDA_VISIBLE_DEVICES=1 python eval.py \
               --model $model \
+              --attr_method $method \
               --attr_method $method \
               --spatial_range $spatial \
               --max_iter $iter \
-              --samples_number $sample \
               --prefix scores \
+              --samples_number $sample \
               --csv_path results_la.csv \
               --attr_prefix attributions
 
@@ -42,12 +43,12 @@ for model in "${models[@]}"; do
     else
       echo "Running $model with $method (no extra params)"
       
-      CUDA_VISIBLE_DEVICES=0 python generate_attributions.py \
+      CUDA_VISIBLE_DEVICES=1 python generate_attributions.py \
         --model $model \
         --attr_method $method \
         --prefix attributions
 
-      CUDA_VISIBLE_DEVICES=0 python eval.py \
+      CUDA_VISIBLE_DEVICES=1 python eval.py \
         --model $model \
         --attr_method $method \
         --prefix scores \
